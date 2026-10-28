@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+.vite/
+*.tsbuildinfo
+*.local
+.DS_Store
+77ec1794f97a789ca089c1b33330d1f5.mp4
