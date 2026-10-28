@@ -21,17 +21,21 @@ export default function App() {
         token: {
           colorPrimary: '#6355e7',
           colorInfo: '#6355e7',
-          colorText: '#292b36',
-          colorTextSecondary: '#858894',
-          colorBorder: '#e9eaf0',
-          borderRadius: 4,
+          colorText: '#292d42',
+          colorTextSecondary: '#73788c',
+          colorBorder: '#e5e7f0',
+          borderRadius: 6,
           fontSize: 13,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
+          motionDurationFast: '0.12s',
+          motionDurationMid: '0.2s',
+          motionDurationSlow: '0.28s',
+          motionEaseOut: 'cubic-bezier(0.22, 1, 0.36, 1)',
         },
         components: {
-          Button: { controlHeight: 32, primaryShadow: 'none' },
-          Table: { headerBg: '#f7f7fb', headerColor: '#3a3c47', rowHoverBg: '#faf9ff' },
-          Menu: { itemSelectedColor: '#6355e7', itemSelectedBg: '#f0efff' },
+          Button: { controlHeight: 32, primaryShadow: '0 2px 4px rgb(99 85 231 / 12%)' },
+          Table: { headerBg: '#f7f7fc', headerColor: '#474d63', rowHoverBg: '#faf9ff' },
+          Menu: { itemSelectedColor: '#6355e7', itemSelectedBg: '#f0eeff' },
         },
       }}
     >

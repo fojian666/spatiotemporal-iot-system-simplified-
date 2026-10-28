@@ -104,6 +104,23 @@ describe('appReducer', () => {
     expect(next.knowledgeBases[0].documentCount).toBe(0);
   });
 
+  it('rejects empty imports and chunks that point to documents outside the payload', () => {
+    const knowledgeState = {
+      ...state,
+      knowledgeBases: [{ id: 'kb-1', name: '政策库', description: '', documentCount: 0, chunkCount: 0, updatedAt: '', enabled: true }],
+    };
+    const document = { id: 'doc-1', knowledgeId: 'kb-1', datasetId: 'dataset-1', name: '政策.txt', format: 'txt', chunkCount: 1, status: 'ready' as const, enabled: true, updatedAt: '2026-10-28 12:00:00' };
+
+    expect(appReducer(knowledgeState, {
+      type: 'document/import',
+      payload: { knowledgeId: 'kb-1', documents: [], chunks: [] },
+    })).toBe(knowledgeState);
+    expect(appReducer(knowledgeState, {
+      type: 'document/import',
+      payload: { knowledgeId: 'kb-1', documents: [{ ...document, id: 'doc-1' }], chunks: [{ ...chunk, documentId: 'doc-missing' }] },
+    })).toBe(knowledgeState);
+  });
+
   it('updates chunk content without mutating the original state', () => {
     const next = appReducer(state, {
       type: 'chunk/update',

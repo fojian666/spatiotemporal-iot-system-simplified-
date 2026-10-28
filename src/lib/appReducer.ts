@@ -45,14 +45,20 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       };
     case 'document/import': {
       const targetExists = state.knowledgeBases.some((base) => base.id === action.payload.knowledgeId);
-      const validDocuments = action.payload.documents.every((document) => {
+      const validDocuments = action.payload.documents.length > 0 && action.payload.documents.every((document) => {
         const dataset = state.datasets.find((item) => item.id === document.datasetId);
         return document.knowledgeId === action.payload.knowledgeId
           && dataset?.enabled
           && dataset.status === 'ready'
           && Boolean(dataset.content.trim());
       });
-      if (!targetExists || !validDocuments) return state;
+      const documentIds = new Set(action.payload.documents.map((document) => document.id));
+      const validChunks = action.payload.chunks.length > 0
+        && action.payload.chunks.every((chunk) => documentIds.has(chunk.documentId));
+      const countsMatch = action.payload.documents.every((document) => (
+        action.payload.chunks.filter((chunk) => chunk.documentId === document.id).length === document.chunkCount
+      ));
+      if (!targetExists || !validDocuments || !validChunks || !countsMatch) return state;
       return {
         ...state,
         documents: [...action.payload.documents, ...state.documents],

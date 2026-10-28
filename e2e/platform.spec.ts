@@ -135,8 +135,8 @@ test('chat remains usable on short and narrow viewports', async ({ page }) => {
     await send.click();
     await expect(page.getByText('二、核心回答')).toBeVisible();
     await expect(send).toBeInViewport({ ratio: 1 });
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
-    expect(overflow).toBe(false);
+    const overflow = await page.evaluate(() => ({ horizontal: document.documentElement.scrollWidth > window.innerWidth, vertical: document.documentElement.scrollHeight > window.innerHeight }));
+    expect(overflow).toEqual({ horizontal: false, vertical: false });
     await page.screenshot({ path: `/tmp/spatiotemporal-e2e-chat-${viewport.width}-${viewport.height}.png`, fullPage: true });
     await page.getByRole('button', { name: '关闭引用' }).click();
     await input.fill('zxqvunknown');
@@ -150,4 +150,90 @@ test('chat remains usable on short and narrow viewports', async ({ page }) => {
       await page.screenshot({ path: '/tmp/spatiotemporal-e2e-mobile-welcome.png', fullPage: true });
     }
   }
+});
+
+test('agent cards settle after entrance and keep hover and keyboard feedback', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/agents');
+  const card = page.locator('.agent-card').first();
+  await expect(card).toBeVisible();
+  const entrance = await card.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { name: style.animationName, duration: parseFloat(style.animationDuration), iterations: style.animationIterationCount };
+  });
+  expect(entrance.name).not.toBe('none');
+  expect(entrance.duration).toBeGreaterThan(0);
+  expect(entrance.duration).toBeLessThanOrEqual(0.4);
+  expect(entrance.iterations).toBe('1');
+  await card.evaluate((element) => Promise.all(element.getAnimations().map((animation) => animation.finished)));
+  await card.hover();
+  await expect.poll(() => card.evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).m42)).toBeLessThan(-1);
+  const filter = page.getByRole('button', { name: '行业问答', exact: true });
+  await filter.focus();
+  await page.keyboard.press('Enter');
+  await expect(filter).toHaveAttribute('aria-pressed', 'true');
+  await expect(filter).toBeFocused();
+  expect(await filter.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
+  await expect(page.locator('.agent-card')).toHaveCount(1);
+});
+
+test('reduced motion removes entrances and hover movement without hiding content', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/agents');
+  const card = page.locator('.agent-card').first();
+  await card.hover();
+  await expect(card).toHaveCSS('transform', 'none');
+  await expect(card).toHaveCSS('animation-name', 'none');
+  await expect(card).toHaveCSS('animation-delay', '0s');
+  await page.getByRole('button', { name: '详情', exact: true }).first().click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCSS('opacity', '1');
+  await page.getByRole('button', { name: '关闭', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await page.getByRole('button', { name: '体验', exact: true }).first().click();
+  await expect(page.getByText('您好，我是自然资源智能管家')).toBeVisible();
+  const input = page.getByPlaceholder('请输入您的问题，Shift + Enter 换行');
+  await input.fill('土地利用总体规划如何审批？');
+  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await expect(page.locator('.message.assistant')).toContainText('二、核心回答');
+  await expect(page.getByLabel('参考来源')).toBeVisible();
+  for (const selector of ['.chat-page', '.message.assistant', '.citation-panel', '.citation-card']) {
+    await expect(page.locator(selector).first()).toHaveCSS('animation-name', 'none');
+  }
+  await page.getByRole('button', { name: /土地利用总体规划编制审批规定/ }).first().click();
+  await expect(page.locator('mark.source-highlight')).toBeVisible();
+});
+
+test('agent filters and cards fit narrow screens without clipped controls', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 600 }, { width: 320, height: 560 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/agents');
+    const search = page.getByPlaceholder('搜索智能体');
+    const filter = page.getByRole('button', { name: '公共服务', exact: true });
+    await expect(search).toBeInViewport({ ratio: 1 });
+    await expect(filter).toBeInViewport({ ratio: 1 });
+    const singleLine = await filter.evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      return range.getClientRects().length === 1;
+    });
+    expect(singleLine).toBe(true);
+    await filter.click();
+    await expect(page.locator('.agent-card')).toHaveCount(1);
+    const card = page.locator('.agent-card');
+    await card.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+    await expect(card).toBeInViewport({ ratio: 1 });
+    await expect(page.getByRole('button', { name: '体验', exact: true })).toBeInViewport({ ratio: 1 });
+    const fits = await page.locator('.app-main').evaluate((element) => element.scrollWidth <= element.clientWidth);
+    expect(fits).toBe(true);
+  }
+});
+
+test('upload dropzone shows keyboard focus on the native file input', async ({ page }) => {
+  await page.goto('/datasets');
+  await page.getByRole('button', { name: /新建数据集/ }).click();
+  await page.getByRole('combobox', { name: /数据分类/ }).focus();
+  await page.keyboard.press('Tab');
+  await expect(page.getByLabel('选择数据文件')).toBeFocused();
+  await expect(page.locator('.upload-dropzone')).toHaveCSS('outline-style', 'solid');
 });

@@ -31,12 +31,12 @@ export const AgentsPage = () => {
       </div>
       <div className="agent-filter-card">
         <div className="agent-filter-heading"><div className="panel-heading"><span className="section-marker" />智能体筛选</div><Input prefix={<SearchOutlined />} placeholder="搜索智能体" value={query} onChange={(event) => setQuery(event.target.value)} allowClear /></div>
-        <div className="agent-filter-row"><span>智能体类型</span>{['全部', '行业问答', '公共服务'].map((value) => <button className={category === value ? 'selected' : ''} key={value} onClick={() => setCategory(value)}>{value}</button>)}</div>
-        <div className="agent-filter-row"><span>业务场景</span>{['全部', '自然资源', '文化旅游'].map((value) => <button className={scenario === value ? 'selected' : ''} key={value} onClick={() => setScenario(value)}>{value}</button>)}</div>
+        <div className="agent-filter-row"><span>智能体类型</span>{['全部', '行业问答', '公共服务'].map((value) => <button className={category === value ? 'selected' : ''} aria-pressed={category === value} key={value} onClick={() => setCategory(value)}>{value}</button>)}</div>
+        <div className="agent-filter-row"><span>业务场景</span>{['全部', '自然资源', '文化旅游'].map((value) => <button className={scenario === value ? 'selected' : ''} aria-pressed={scenario === value} key={value} onClick={() => setScenario(value)}>{value}</button>)}</div>
       </div>
       <div className="agent-grid">
         {agents.map((agent) => (
-          <article className="agent-card" key={agent.id}>
+          <article className="agent-card" key={agent.id} style={{ borderTopColor: agent.color }}>
             <div className="agent-card-main">
               <div className="agent-card-title"><AgentLogo color={agent.color} /><div><h2>{agent.name}</h2><div><Tag>{agent.category}</Tag><Tag>{agent.scenario}</Tag></div></div></div>
               <p>{agent.description}</p>
