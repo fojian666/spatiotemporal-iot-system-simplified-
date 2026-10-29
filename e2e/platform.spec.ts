@@ -258,3 +258,38 @@ test('upload dropzone shows keyboard focus on the native file input', async ({ p
   await expect(page.getByLabel('选择数据文件')).toBeFocused();
   await expect(page.locator('.upload-dropzone')).toHaveCSS('outline-style', 'solid');
 });
+
+test('knowledge import fits narrow and zoom-equivalent viewports', async ({ page }) => {
+  for (const viewport of [{ width: 320, height: 568 }, { width: 360, height: 640 }, { width: 512, height: 384 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/knowledge/import');
+    const main = page.locator('.app-main');
+    await expect.poll(() => main.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+    const knowledge = page.locator('.knowledge-info-form .ant-select');
+    await expect(knowledge).toBeInViewport({ ratio: 1 });
+    await knowledge.click();
+    await expect(page.getByText('自然资源政策法规知识库', { exact: true }).last()).toBeVisible();
+    await page.keyboard.press('Escape');
+    const filter = page.getByPlaceholder('请输入数据集名称');
+    await filter.scrollIntoViewIfNeeded();
+    await expect(filter).toBeInViewport({ ratio: 1 });
+    await filter.fill('土地');
+    await expect(page.getByRole('row').filter({ hasText: '土地利用总体规划编制审批规定.txt' })).toBeVisible();
+  }
+});
+
+test('short-screen dialogs keep actions visible and their contents scrollable', async ({ page }) => {
+  for (const viewport of [{ width: 320, height: 320 }, { width: 720, height: 354 }, { width: 1280, height: 560 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/datasets');
+    await page.getByRole('button', { name: /新建数据集/ }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByRole('button', { name: /确\s*定/ })).toBeInViewport({ ratio: 1 });
+    const body = dialog.locator('.ant-modal-body');
+    await expect(body).toHaveCSS('overflow-y', 'auto');
+    await dialog.getByLabel('选择数据文件').setInputFiles({ name: '短屏测试.txt', mimeType: 'text/plain', buffer: Buffer.from('短屏上传测试') });
+    await dialog.getByRole('button', { name: /确\s*定/ }).click();
+    await expect(dialog).toBeHidden();
+    await expect(page.getByRole('link', { name: '短屏测试.txt' }).first()).toBeVisible();
+  }
+});
