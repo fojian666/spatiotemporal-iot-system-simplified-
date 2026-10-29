@@ -124,7 +124,7 @@ test('a storage quota failure leaves uploads open and existing datasets unchange
 });
 
 test('chat remains usable on short and narrow viewports', async ({ page }) => {
-  for (const viewport of [{ width: 1280, height: 600 }, { width: 1280, height: 560 }, { width: 720, height: 354 }, { width: 390, height: 600 }]) {
+  for (const viewport of [{ width: 1280, height: 600 }, { width: 1280, height: 560 }, { width: 720, height: 354 }, { width: 390, height: 600 }, { width: 450, height: 258 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/agents/agent-natural/chat');
     const send = page.getByRole('button', { name: '发送', exact: true });
