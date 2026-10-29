@@ -177,9 +177,25 @@ test('agent cards settle after entrance and keep hover and keyboard feedback', a
   await expect(page.locator('.agent-card')).toHaveCount(1);
 });
 
+test('header flows and route changes animate without interrupting navigation', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/datasets');
+  const header = page.locator('.app-header');
+  expect(await header.evaluate((element) => getComputedStyle(element, '::after').animationName)).toBe('header-flow');
+  await page.getByRole('link', { name: '知识库管理', exact: true }).first().click();
+  await expect(page).toHaveURL(/\/knowledge$/);
+  const content = page.locator('.app-main > .page');
+  await expect(content).toBeVisible();
+  await expect(content).toHaveCSS('animation-name', 'page-enter');
+  await page.getByRole('link', { name: '智能体中心', exact: true }).click();
+  await expect(page).toHaveURL(/\/agents$/);
+  await expect(page.locator('.agent-card').first()).toBeVisible();
+});
+
 test('reduced motion removes entrances and hover movement without hiding content', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/agents');
+  expect(await page.locator('.app-header').evaluate((element) => getComputedStyle(element, '::after').animationName)).toBe('none');
   const card = page.locator('.agent-card').first();
   await card.hover();
   await expect(card).toHaveCSS('transform', 'none');

@@ -79,7 +79,7 @@ export const AppLayout = () => {
             onClick={() => setCollapsed((value) => !value)}
           />
         </aside>
-        <main className="app-main"><Outlet /></main>
+        <main className="app-main"><Outlet key={location.pathname} /></main>
       </div>
     </div>
   );
