@@ -14,7 +14,7 @@ describe('application shell', () => {
       </AppProvider>,
     );
 
-    expect(screen.getByText('行业大模型管理平台')).toBeInTheDocument();
+    expect(screen.getByText('时空智能物联网系统')).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: '主导航' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: '数据集管理' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /土地利用总体规划编制审批规定.txt/ })).toHaveAttribute('href', '/datasets/ds-001');

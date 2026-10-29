@@ -31,7 +31,7 @@ export const AppLayout = () => {
       <header className="app-header">
         <div className="brand">
           <span className="brand-mark"><DeploymentUnitOutlined /></span>
-          <span>行业大模型管理平台</span>
+          <span>时空智能物联网系统</span>
         </div>
         <div className="header-actions">
           <Tooltip title="暂无新通知">
