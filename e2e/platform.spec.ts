@@ -182,6 +182,8 @@ test('header flows and route changes animate without interrupting navigation', a
   await page.goto('/datasets');
   const header = page.locator('.app-header');
   expect(await header.evaluate((element) => getComputedStyle(element, '::after').animationName)).toBe('header-flow');
+  expect(await header.evaluate((element) => getComputedStyle(element, '::before').animationName)).toBe('header-glow');
+  await expect(page.locator('.dataset-workspace')).toHaveCSS('animation-name', 'section-enter');
   await page.getByRole('link', { name: '知识库管理', exact: true }).first().click();
   await expect(page).toHaveURL(/\/knowledge$/);
   const content = page.locator('.app-main > .page');
@@ -196,6 +198,7 @@ test('reduced motion removes entrances and hover movement without hiding content
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/agents');
   expect(await page.locator('.app-header').evaluate((element) => getComputedStyle(element, '::after').animationName)).toBe('none');
+  expect(await page.locator('.app-header').evaluate((element) => getComputedStyle(element, '::before').animationName)).toBe('none');
   const card = page.locator('.agent-card').first();
   await card.hover();
   await expect(card).toHaveCSS('transform', 'none');
@@ -208,6 +211,8 @@ test('reduced motion removes entrances and hover movement without hiding content
   await expect(page.getByRole('dialog')).toBeHidden();
   await page.getByRole('button', { name: '体验', exact: true }).first().click();
   await expect(page.getByText('您好，我是自然资源智能管家')).toBeVisible();
+  expect(await page.locator('.chat-main').evaluate((element) => getComputedStyle(element, '::after').animationName)).toBe('none');
+  expect(await page.locator('.robot-avatar').evaluate((element) => getComputedStyle(element, '::before').animationName)).toBe('none');
   const input = page.getByPlaceholder('请输入您的问题，Shift + Enter 换行');
   await input.fill('土地利用总体规划如何审批？');
   await page.getByRole('button', { name: '发送', exact: true }).click();

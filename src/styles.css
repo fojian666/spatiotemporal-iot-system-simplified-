@@ -23,8 +23,10 @@ a { color: inherit; text-decoration: none; }
 .app-shell { height: 100vh; height: 100dvh; min-height: 480px; overflow: hidden; }
 .app-header { position: relative; z-index: 20; display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 24px 0 20px; overflow: hidden; color: #fff; background: linear-gradient(105deg, #5c7be5 0%, #7761df 55%, #a963cc 100%); box-shadow: 0 2px 12px rgb(78 68 160 / 14%); }
 .app-header::after { position: absolute; inset: 0 -50%; z-index: -1; background: linear-gradient(125deg, transparent 42%, rgb(255 255 255 / 9%) 49%, transparent 58%), linear-gradient(45deg, transparent 55%, rgb(210 226 255 / 10%) 62%, transparent 72%); content: ""; pointer-events: none; animation: header-flow 18s ease-in-out infinite alternate; }
+.app-header::before { position: absolute; inset: -100% -20%; z-index: -1; background: radial-gradient(ellipse at 25% 50%, rgb(180 224 255 / 24%), transparent 28%), radial-gradient(ellipse at 75% 50%, rgb(255 195 246 / 24%), transparent 32%); content: ""; pointer-events: none; animation: header-glow 12s ease-in-out infinite alternate; }
 .brand { display: flex; gap: 10px; align-items: center; font-size: 18px; font-weight: 600; letter-spacing: .6px; }
 .brand-mark { display: grid; width: 30px; height: 30px; background: rgb(255 255 255 / 12%); border: 1px solid rgb(255 255 255 / 20%); border-radius: 8px; place-items: center; font-size: 20px; }
+.brand-mark { box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), 0 3px 12px rgb(40 34 119 / 12%); transition: transform 240ms var(--motion-ease), background-color 240ms; }
 .header-actions { display: flex; gap: 12px; align-items: center; font-size: 12px; }
 .header-actions > [tabindex]:focus-visible { outline-color: #fff; }
 .header-icon { color: #fff; font-size: 17px; }
@@ -35,11 +37,14 @@ a { color: inherit; text-decoration: none; }
 .main-nav { flex: 1; padding: 14px 10px 52px; overflow: auto; }
 .nav-group { margin-bottom: 8px; }
 .nav-group-title, .nav-single { position: relative; display: flex; gap: 10px; align-items: center; height: 40px; padding: 0 12px; color: #45495c; border-radius: 7px; font-size: 14px; font-weight: 500; white-space: nowrap; }
-.nav-group-title, .nav-single, .nav-child { transition: color var(--motion-fast), background-color var(--motion-fast); }
+.nav-group-title, .nav-single, .nav-child { transition: color var(--motion-fast), background-color var(--motion-fast), transform 220ms var(--motion-ease); }
 .nav-group-title:hover, .nav-single:hover { color: var(--accent); background: #f7f6ff; }
 .nav-group.active > .nav-group-title, .nav-single.active { color: #5747ce; background: var(--accent-soft); }
 .nav-group.active > .nav-group-title::before, .nav-single.active::before { position: absolute; top: 12px; bottom: 12px; left: 0; width: 3px; background: var(--accent); border-radius: 0 3px 3px 0; content: ""; }
 .nav-icon { display: inline-flex; flex: 0 0 18px; justify-content: center; font-size: 16px; }
+.nav-icon { transition: transform 220ms var(--motion-ease), color 220ms; }
+.nav-group.active > .nav-group-title .nav-icon, .nav-single.active .nav-icon { color: var(--accent); transform: scale(1.08); }
+.nav-group.active > .nav-group-title::before, .nav-single.active::before { animation: nav-indicator 300ms var(--motion-ease); }
 .nav-arrow { margin-left: auto; color: #a5a6b1; font-size: 10px; }
 .nav-children { padding: 3px 0; }
 .nav-child { display: flex; align-items: center; height: 36px; padding-left: 40px; color: var(--muted); border-radius: 7px; font-size: 13px; }
@@ -224,6 +229,7 @@ a { color: inherit; text-decoration: none; }
 .conversation-empty { padding: 24px 0; color: #b0b1ba; font-size: 12px; text-align: center; }
 .chat-main { position: relative; display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; background: radial-gradient(ellipse at 45% 35%, rgb(255 255 255 / 95%), transparent 65%), linear-gradient(145deg, #eef3ff, #f4f1ff 60%, #edf5ff); }
 .chat-main::before { position: absolute; inset: 0; background: repeating-radial-gradient(ellipse at 100% 0%, transparent 0 48px, rgb(113 111 182 / 5%) 49px 50px, transparent 51px 80px); mask-image: linear-gradient(90deg, transparent 30%, #000); content: ""; pointer-events: none; }
+.chat-main::after { position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 15%, rgb(144 192 255 / 15%), transparent 38%), radial-gradient(ellipse at 80% 80%, rgb(180 151 255 / 14%), transparent 38%); content: ""; pointer-events: none; animation: ambient-drift 14s ease-in-out infinite alternate; }
 .chat-messages { position: relative; z-index: 1; flex: 1; min-height: 0; padding: 24px; overflow: auto; }
 .chat-welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; padding: 24px 0 16px; }
 .robot-avatar { position: relative; display: grid; flex-shrink: 0; width: 64px; height: 64px; margin-bottom: 28px; color: #fff; background: linear-gradient(145deg, #75b7ec, #7661dc); border: 4px solid rgb(255 255 255 / 75%); border-radius: 20px; box-shadow: 0 8px 24px rgb(107 99 211 / 18%), inset 0 1px 0 rgb(255 255 255 / 40%); place-items: center; font-size: 28px; }
@@ -348,6 +354,8 @@ a { color: inherit; text-decoration: none; }
 .agent-card-actions .ant-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
 .chat-agent-header, .chat-tabs, .chat-composer, .citation-header { flex-shrink: 0; }
 .page, .chat-page { animation: page-enter 240ms var(--motion-ease); }
+.page-header-row, .dataset-workspace, .content-card, .agent-filter-card, .agents-topbar { animation: section-enter 380ms var(--motion-ease) both; }
+.dataset-workspace, .agent-filter-card { animation-delay: 45ms; }
 .agent-card { animation: surface-enter var(--motion-enter) var(--motion-ease) backwards; }
 .agent-card:nth-child(2) { animation-delay: 50ms; }
 .agent-card:nth-child(3) { animation-delay: 100ms; }
@@ -360,12 +368,23 @@ a { color: inherit; text-decoration: none; }
 .message-list > .message:nth-last-child(-n+2) { animation: surface-enter 240ms var(--motion-ease); }
 .citation-panel { animation: panel-enter 240ms var(--motion-ease); }
 .source-preview, .citation-list, .settings-saved { animation: page-enter 200ms var(--motion-ease); }
+.robot-avatar::before { animation: avatar-breathe 3.6s ease-in-out infinite alternate; }
+.robot-avatar::after { animation: avatar-breathe 3.6s ease-in-out 450ms infinite alternate; }
 @keyframes header-flow { from { transform: translateX(-15%); } to { transform: translateX(15%); } }
+@keyframes header-glow { from { transform: translateX(-8%) scale(1); opacity: .6; } to { transform: translateX(8%) scale(1.08); opacity: 1; } }
+@keyframes ambient-drift { from { transform: translate3d(-2%, -2%, 0) scale(1.04); opacity: .6; } to { transform: translate3d(2%, 2%, 0) scale(1.04); opacity: 1; } }
+@keyframes avatar-breathe { from { transform: scale(.94); opacity: .45; } to { transform: scale(1.12); opacity: 1; } }
+@keyframes nav-indicator { from { opacity: 0; transform: scaleY(.35); } to { opacity: 1; transform: scaleY(1); } }
 @keyframes page-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes section-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes surface-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes panel-enter { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes history-enter { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.06); background-color: rgb(255 255 255 / 22%); }
+  .nav-group-title:hover .nav-icon, .nav-single:hover .nav-icon { transform: translateX(2px); }
+  .nav-child:hover { transform: translateX(2px); }
+  .ant-table-tbody > tr > td { transition: background-color 180ms ease; }
   .agent-card:hover { box-shadow: var(--shadow-raised); transform: translateY(-3px); }
   .suggestion-card button:hover { transform: translateY(-2px); }
   .citation-card:hover { transform: translateX(-2px); }
@@ -380,5 +399,6 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   /* Ant Design needs end events to finish closing popups. */
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; transition-delay: 0s !important; animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
-  .app-header::after, .page, .chat-page, .agent-card, .chat-welcome > *, .chat-composer, .message-list > .message, .citation-panel, .source-preview, .citation-list, .settings-saved, .history-open .conversation-sidebar { animation: none !important; }
+  .app-header::before, .app-header::after, .chat-main::after, .robot-avatar::before, .robot-avatar::after, .nav-group.active > .nav-group-title::before, .nav-single.active::before, .page, .chat-page, .page-header-row, .dataset-workspace, .content-card, .agent-filter-card, .agents-topbar, .agent-card, .chat-welcome > *, .chat-composer, .message-list > .message, .citation-panel, .source-preview, .citation-list, .settings-saved, .history-open .conversation-sidebar { animation: none !important; }
+  .nav-group.active > .nav-group-title .nav-icon, .nav-single.active .nav-icon { transform: none; }
 }
